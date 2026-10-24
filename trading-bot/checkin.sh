@@ -11,7 +11,7 @@ for b in mr trend xsmom; do
   if [ ! -f "$d/state.json" ] && [ -f "snapshot/$b/state.json" ]; then
     cp snapshot/$b/* "$d/"; echo "[$b] Stand aus Sicherung wiederhergestellt"
   fi
-  if ! ps -eo cmd | grep -v grep | grep -qF "${CMD[$b]%% --hours*}"; then
+  if ! ps -eo cmd | grep -v grep | grep -qF "${CMD[$b]%%--hours*}--hours"; then
     if [ -f "$d/state.json" ] && ! grep -q "ENDE" "$d/bot.log" 2>/dev/null; then
       setsid nohup ${CMD[$b]} >/dev/null 2>&1 </dev/null & echo "[$b] neu gestartet"
     fi
