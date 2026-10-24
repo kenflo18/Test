@@ -79,6 +79,19 @@ def atr(bars, n):
     return out
 
 def signal(bars):
+    return STRATS[STRAT]["signal"](bars)
+
+def signal_trend(bars):
+    """Trendfolge (Donchian-Ausbruch + EMA-Filter), wie klassische Trendfonds."""
+    if len(bars) < 60: return None, 0
+    c = [b["c"] for b in bars]
+    e1, e2 = ema(c, 20)[-1], ema(c, 50)[-1]; a = atr(bars, P["atr_n"])[-1]
+    w = bars[-P["donchian"] - 1:-1]
+    if c[-1] > max(b["h"] for b in w) and e1 > e2: return "long", a
+    if c[-1] < min(b["l"] for b in w) and e1 < e2: return "short", a
+    return None, a
+
+def signal_mr(bars):
     """Signal auf dem letzten abgeschlossenen Bar: ('long'|'short'|None, atr)."""
     n = P["bb_n"]
     if len(bars) < 60: return None, 0
@@ -88,6 +101,21 @@ def signal(bars):
     if c[-1] < m - P["bb_k"] * sd and r < P["rsi_lo"]: return "long", a
     if c[-1] > m + P["bb_k"] * sd and r > 100 - P["rsi_lo"]: return "short", a
     return None, a
+
+SYMBOLS12 = SYMBOLS + ["ADAUSDT", "AVAXUSDT", "LINKUSDT", "LTCUSDT", "TRXUSDT", "DOTUSDT"]
+STRATS = {
+    "mr": dict(signal=signal_mr, symbols=SYMBOLS, title="Mean Reversion (1h)", p={}),
+    "trend": dict(signal=signal_trend, symbols=SYMBOLS12, title="Trendfolge (4h)",
+                  p=dict(interval="4h", bar_ms=14_400_000, donchian=20, stop_atr=3.0, max_stop_pct=0.12,
+                         trail_trigger_atr=1.5, trail_atr=4.0, time_stop_bars=10**9, max_pos=4)),
+}
+STRAT = "mr"
+
+def use(strat, folder=None):
+    global STRAT, SYMBOLS, STATE, TRADES, STATUS, LOG
+    STRAT = strat; P.update(STRATS[strat]["p"]); SYMBOLS = STRATS[strat]["symbols"]
+    d = folder or HERE; os.makedirs(d, exist_ok=True)
+    STATE, TRADES, STATUS, LOG = (os.path.join(d, f) for f in ("state.json", "trades.csv", "status.md", "bot.log"))
 
 # ---------- Konto / Positionen ----------
 class Book:
@@ -111,12 +139,12 @@ class Book:
 
     def equity(s, px=None): return s.balance + s.upnl(px)
 
-    def open(s, sym, side, price, a, t):
+    def open(s, sym, side, price, a, t, notional=None, stop_pct=None):
         eq = s.equity()
         d = 1 if side == "long" else -1
         fill = price * (1 + d * P["slip"])
-        stop_dist = min(P["stop_atr"] * a, P["max_stop_pct"] * fill)
-        qty = (eq * P["risk"]) / stop_dist
+        stop_dist = stop_pct * fill if stop_pct else min(P["stop_atr"] * a, P["max_stop_pct"] * fill)
+        qty = notional / fill if notional else (eq * P["risk"]) / stop_dist
         used = sum(p["qty"] * p["entry"] for p in s.pos.values())
         qty = min(qty, max(0, P["leverage"] * eq - used) / fill)
         if qty * fill < 10: return
@@ -169,7 +197,7 @@ class Book:
 def summary(b, title, extra=""):
     eq = b.equity(); tr = b.trades
     wins = [x for x in tr if x["pnl"] > 0]
-    lines = [f"# {title}", "", f"Stand: {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC", extra, "",
+    lines = [f"# {title} – {STRATS.get(STRAT, {}).get('title', STRAT)}", "", f"Stand: {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC", extra, "",
              f"- Kapital: **{eq:.2f} $** (Start {P['start_equity']:.0f} $, {100*(eq/P['start_equity']-1):+.2f} %)",
              f"- Realisiert: {b.balance:.2f} $ | offen: {b.upnl():+.2f} $",
              f"- Trades: {len(tr)} | Gewinner: {len(wins)} ({100*len(wins)/len(tr) if tr else 0:.0f} %)",
@@ -273,7 +301,10 @@ if __name__ == "__main__":
     ap.add_argument("mode", choices=["backtest", "live", "status"])
     ap.add_argument("--days", type=int, default=14)
     ap.add_argument("--hours", type=float, default=72)
+    ap.add_argument("--strategy", default="mr")
+    ap.add_argument("--dir", default=None)
     a = ap.parse_args()
+    if a.strategy in STRATS: use(a.strategy, a.dir)
     if a.mode == "backtest": backtest(a.days)
     elif a.mode == "live": live(a.hours)
     else: print(open(STATUS).read() if os.path.exists(STATUS) else "noch kein Status")
