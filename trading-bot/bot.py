@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Aggressiver Momentum-Breakout-Bot (Paper-Trading) fuer Krypto, Long + Short.
+"""Aggressiver Mean-Reversion-Bot (Paper-Trading) fuer Krypto, Long + Short, 1h-Kerzen.
+Kauft Ueberverkauft-Extreme (unter Bollinger-Band 2,5 SD + RSI<30), shortet Ueberkauft-Extreme.
 
 Daten: oeffentliche Binance-Marktdaten (kein API-Key noetig).
 Modi:
@@ -19,22 +20,20 @@ LOG = os.path.join(HERE, "bot.log")
 
 P = dict(
     start_equity=500.0,
-    interval="5m",
-    breakout=20,        # Donchian-Fenster (Bars)
-    ema_f=9, ema_m=21, ema_s=50,
+    interval="1h", bar_ms=3_600_000,
+    bb_n=20, bb_k=2.5, rsi_lo=30,
     atr_n=14,
-    vol_mult=1.5,       # Volumen muss 1,5x Durchschnitt sein
     risk=0.03,          # 3 % Risiko pro Trade (aggressiv)
-    stop_atr=1.5, max_stop_pct=0.02,   # Stop: 1,5 ATR, hoechstens 2 % vom Einstieg
-    trail_trigger_atr=1.0, trail_atr=2.0,
-    time_stop_bars=12,  # nach 1 h ohne Fortschritt raus
+    stop_atr=2.0, max_stop_pct=0.05,   # Stop: 2 ATR, hoechstens 5 % vom Einstieg
+    trail_trigger_atr=1.0, trail_atr=1.0,  # ab +1 ATR Gewinn eng nachziehen
+    time_stop_bars=12,  # nach 12 h ohne Fortschritt raus
     leverage=3.0,       # max. Gesamtexposure = 3x Kapital
     max_pos=2,
-    fee=0.001, slip=0.0005,
+    fee=0.0005, slip=0.0003,  # Futures-Taker-Gebuehr + Slippage
     pause_dd=0.12,      # -12 % vom Hoch -> 6 h Pause
     pause_hours=6,
     kill_dd=0.25,       # -25 % vom Start -> Bot stoppt endgueltig
-    cooldown_bars=6,    # nach Verlust 30 min kein neuer Trade im selben Coin
+    cooldown_bars=0,
 )
 
 def log(msg):
@@ -81,17 +80,13 @@ def atr(bars, n):
 
 def signal(bars):
     """Signal auf dem letzten abgeschlossenen Bar: ('long'|'short'|None, atr)."""
-    if len(bars) < P["ema_s"] + 5: return None, 0
-    c = [b["c"] for b in bars]
-    ef, em, es = ema(c, P["ema_f"])[-1], ema(c, P["ema_m"])[-1], ema(c, P["ema_s"])[-1]
+    n = P["bb_n"]
+    if len(bars) < 60: return None, 0
+    c = [b["c"] for b in bars]; w = c[-n:]
+    m = sum(w) / n; sd = (sum((x - m) ** 2 for x in w) / n) ** 0.5
     r = rsi(c)[-1]; a = atr(bars, P["atr_n"])[-1]
-    win = bars[-P["breakout"] - 1:-1]
-    hi, lo = max(b["h"] for b in win), min(b["l"] for b in win)
-    vavg = sum(b["v"] for b in win) / len(win)
-    last = bars[-1]
-    vol_ok = last["v"] > P["vol_mult"] * vavg
-    if last["c"] > hi and ef > em > es and 55 < r < 80 and vol_ok: return "long", a
-    if last["c"] < lo and ef < em < es and 20 < r < 45 and vol_ok: return "short", a
+    if c[-1] < m - P["bb_k"] * sd and r < P["rsi_lo"]: return "long", a
+    if c[-1] > m + P["bb_k"] * sd and r > 100 - P["rsi_lo"]: return "short", a
     return None, a
 
 # ---------- Konto / Positionen ----------
@@ -138,7 +133,7 @@ class Book:
         net = pnl - p["fees"]
         s.trades.append(dict(sym=sym, side="long" if d == 1 else "short", entry=p["entry"], exit=fill, qty=p["qty"],
                              pnl=round(net, 4), why=why, t_in=p["t"], t_out=t))
-        if net < 0: s.cool[sym] = t + P["cooldown_bars"] * 300_000
+        if net < 0: s.cool[sym] = t + P["cooldown_bars"] * P["bar_ms"]
         log(f"CLOSE {sym} @ {fill:.6g} ({why}) PnL {net:+.2f}$ | Kontostand {s.balance:.2f}$")
 
     def manage(s, sym, hi, lo, close, t, new_bar):
@@ -188,9 +183,9 @@ def summary(b, title, extra=""):
 
 # ---------- Backtest ----------
 def fetch_hist(sym, days):
-    need, out, end = days * 288 + 60, [], None
+    need, out, end = days * 86_400_000 // P["bar_ms"] + 60, [], None
     while len(out) < need:
-        chunk = klines(sym, "5m", 1000, end)
+        chunk = klines(sym, P["interval"], 1000, end)
         if not chunk: break
         out = chunk + out; end = chunk[0]["t"] - 1
         if len(chunk) < 1000: break
@@ -220,7 +215,8 @@ def backtest(days):
     mdd, pk = 0, P["start_equity"]
     for e in curve: pk = max(pk, e); mdd = max(mdd, 1 - e / pk)
     # 3-Tages-Fenster
-    w = 864; rets = [curve[j+w]/curve[j]-1 for j in range(0, len(curve)-w, 288)]
+    day = 86_400_000 // P["bar_ms"]; w = 3 * day
+    rets = [curve[j+w]/curve[j]-1 for j in range(0, len(curve)-w, day)]
     print(f"Backtest {days} Tage, {len(SYMBOLS)} Coins: Ende {eq:.2f}$ ({100*(eq/P['start_equity']-1):+.1f} %), "
           f"Trades {len(tr)}, Trefferquote {100*sum(x['pnl']>0 for x in tr)/max(1,len(tr)):.0f} %, max. Drawdown {100*mdd:.1f} %")
     if rets: print(f"3-Tages-Fenster: bestes {100*max(rets):+.1f} %, schlechtestes {100*min(rets):+.1f} %, "
