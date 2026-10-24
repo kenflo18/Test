@@ -1,2 +1,6 @@
+state.json
 state.json.tmp
+status.md
+trades.csv
+bot.log
 __pycache__/
