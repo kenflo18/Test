@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 358
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}   # neuesten Stand holen, nicht den beim Einreihen
       - name: Bots laufen lassen
         env:
           MAX_MINUTES: "345"

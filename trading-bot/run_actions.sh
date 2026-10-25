@@ -6,7 +6,15 @@ git config user.name "trading-bot"; git config user.email "trading-bot@users.nor
 push() {
   ( cd .. && git add trading-bot/runs && { git diff --cached --quiet || {
       git commit -qm "Bot-Stand $(date -u '+%F %H:%M') UTC"
-      for i in 1 2 3 4; do git pull -q --rebase origin "$GITHUB_REF_NAME" && git push -q origin HEAD:"$GITHUB_REF_NAME" && break; sleep $((2**i)); done; }; } )
+      for i in 1 2 3 4; do
+        # Bei Konflikten gewinnt der Stand dieses Laufs (-X theirs = eigener Commit beim Rebase)
+        if git pull -q --rebase -X theirs origin "$GITHUB_REF_NAME"; then
+          git push -q origin HEAD:"$GITHUB_REF_NAME" && break
+        else
+          git rebase --abort 2>/dev/null
+        fi
+        sleep $((2**i))
+      done; }; } )
 }
 pids=()
 for b in mr trend xsmom; do
