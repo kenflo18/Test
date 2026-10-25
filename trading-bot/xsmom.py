@@ -34,8 +34,11 @@ def live(hours):
     meta = dict(start_ms=d.get("start_ms", now), end_ms=d.get("end_ms", now + int(hours * 3_600_000)),
                 next_rebal=d.get("next_rebal", now), last_bar={})
     bot.log(f"Start/Fortsetzung Momentum-Rotation. Kapital {b.equity():.2f}$")
+    stop_at = time.time() + bot.MAX_MIN * 60 if bot.MAX_MIN else None
     while True:
         now = int(time.time() * 1000)
+        if stop_at and time.time() > stop_at:
+            bot.save(b, meta); bot.log("Lauf-Pause (Job-Ende), Stand gespeichert"); return
         try:
             px = {x["symbol"]: float(x["price"]) for x in bot.get("/api/v3/ticker/price?symbols=" + json.dumps(bot.SYMBOLS, separators=(",", ":")))}
             b.last_px.update(px)
@@ -58,7 +61,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=["live"]); ap.add_argument("--hours", type=float, default=72)
     ap.add_argument("--dir", default=os.path.join(bot.HERE, "runs", "xsmom"))
+    ap.add_argument("--max-minutes", type=float, default=None)
     a = ap.parse_args()
+    bot.MAX_MIN = a.max_minutes
     bot.STRATS["xsmom"] = dict(signal=None, symbols=bot.SYMBOLS12, title="Momentum-Rotation (72h, 24h-Rebalance)",
                                p=dict(time_stop_bars=10**9, max_pos=99, leverage=99))
     bot.use("xsmom", a.dir)

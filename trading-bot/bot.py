@@ -262,14 +262,19 @@ def save(b, meta):
     end = datetime.fromtimestamp(meta["end_ms"]/1000, timezone.utc)
     with open(STATUS, "w") as f: f.write(summary(b, "Trading-Bot Zwischenstand", f"Laeuft bis: {end:%Y-%m-%d %H:%M} UTC"))
 
+MAX_MIN = None  # Lauf nach so vielen Minuten sauber beenden (fuer GitHub Actions)
+
 def live(hours):
     d = json.load(open(STATE)) if os.path.exists(STATE) else {}
     b = Book(d)
     now = int(time.time() * 1000)
     meta = dict(start_ms=d.get("start_ms", now), end_ms=d.get("end_ms", now + int(hours * 3_600_000)), last_bar=d.get("last_bar", {}))
     log(f"Start/Fortsetzung. Kapital {b.equity():.2f}$, Ende {datetime.fromtimestamp(meta['end_ms']/1000, timezone.utc):%Y-%m-%d %H:%M} UTC")
+    stop_at = time.time() + MAX_MIN * 60 if MAX_MIN else None
     while True:
         now = int(time.time() * 1000)
+        if stop_at and time.time() > stop_at:
+            save(b, meta); log("Lauf-Pause (Job-Ende), Stand gespeichert"); return
         try:
             if now >= meta["end_ms"]:
                 px = {x["symbol"]: float(x["price"]) for x in get("/api/v3/ticker/price?symbols=" + json.dumps(SYMBOLS, separators=(',', ':')))}
@@ -303,7 +308,9 @@ if __name__ == "__main__":
     ap.add_argument("--hours", type=float, default=72)
     ap.add_argument("--strategy", default="mr")
     ap.add_argument("--dir", default=None)
+    ap.add_argument("--max-minutes", type=float, default=None)
     a = ap.parse_args()
+    MAX_MIN = a.max_minutes
     if a.strategy in STRATS: use(a.strategy, a.dir)
     if a.mode == "backtest": backtest(a.days)
     elif a.mode == "live": live(a.hours)

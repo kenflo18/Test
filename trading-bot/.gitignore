@@ -1,8 +1,2 @@
-/state.json
-/state.json.tmp
-/status.md
-/trades.csv
-/bot.log
-runs/
 *.tmp
 __pycache__/

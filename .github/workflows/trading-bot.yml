@@ -1,0 +1,20 @@
+name: Trading-Bot (Paper)
+on:
+  schedule:
+    - cron: "7 * * * *"   # stuendlich; laeuft noch ein Job, wartet der naechste
+  workflow_dispatch:
+concurrency:
+  group: trading-bot
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 358
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bots laufen lassen
+        env:
+          MAX_MINUTES: "345"
+        run: trading-bot/run_actions.sh
