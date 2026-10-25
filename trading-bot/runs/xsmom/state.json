@@ -1,6 +1,6 @@
 {
  "balance": 499.5000000000001,
- "peak": 500.4076298258722,
+ "peak": 500.8115722668216,
  "pos": {
   "BTCUSDT": {
    "dir": 1,
@@ -74,18 +74,18 @@
  "killed": false,
  "trades": [],
  "last_px": {
-  "BTCUSDT": 80963.94,
-  "ETHUSDT": 2367.83,
-  "BNBUSDT": 745.87,
-  "LTCUSDT": 57.1,
-  "ADAUSDT": 0.2081,
-  "XRPUSDT": 1.3103,
-  "TRXUSDT": 0.3292,
-  "LINKUSDT": 11.6,
-  "DOGEUSDT": 0.07789,
-  "SOLUSDT": 102.52,
-  "DOTUSDT": 1.044,
-  "AVAXUSDT": 8.984
+  "BTCUSDT": 80908.01,
+  "ETHUSDT": 2364.71,
+  "BNBUSDT": 745.11,
+  "LTCUSDT": 56.96,
+  "ADAUSDT": 0.2077,
+  "XRPUSDT": 1.3118,
+  "TRXUSDT": 0.3289,
+  "LINKUSDT": 11.583,
+  "DOGEUSDT": 0.0777,
+  "SOLUSDT": 102.43,
+  "DOTUSDT": 1.042,
+  "AVAXUSDT": 8.972
  },
  "start_ms": 1792874461030,
  "end_ms": 1793133119363,
