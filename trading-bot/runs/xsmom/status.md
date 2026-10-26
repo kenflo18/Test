@@ -1,20 +1,20 @@
 # Trading-Bot Zwischenstand – Momentum-Rotation (72h, 24h-Rebalance)
 
-Stand: 2026-10-26 06:07 UTC
+Stand: 2026-10-26 06:22 UTC
 Laeuft bis: 2026-10-27 20:31 UTC
 
-- Kapital: **507.23 $** (Start 500 $, +1.45 %)
-- Realisiert: 498.93 $ | offen: +8.30 $
+- Kapital: **506.75 $** (Start 500 $, +1.35 %)
+- Realisiert: 498.93 $ | offen: +7.82 $
 - Trades: 3 | Gewinner: 1 (33 %)
 - Status: aktiv
 
 ## Offene Positionen
-- BNBUSDT LONG @ 732.3, Stop 673.716, jetzt 740.52
-- TRXUSDT LONG @ 0.329699, Stop 0.303323, jetzt 0.3302
+- BNBUSDT LONG @ 732.3, Stop 673.716, jetzt 740
+- TRXUSDT LONG @ 0.329699, Stop 0.303323, jetzt 0.3301
 - DOTUSDT SHORT @ 1.03969, Stop 1.12286, jetzt 1.009
-- XRPUSDT LONG @ 1.30019, Stop 1.19617, jetzt 1.2887
-- LINKUSDT SHORT @ 11.4896, Stop 12.4087, jetzt 11.407
-- LTCUSDT SHORT @ 57.0429, Stop 61.6063, jetzt 56.52
+- XRPUSDT LONG @ 1.30019, Stop 1.19617, jetzt 1.2875
+- LINKUSDT SHORT @ 11.4896, Stop 12.4087, jetzt 11.412
+- LTCUSDT SHORT @ 57.0429, Stop 61.6063, jetzt 56.55
 
 ## Letzte Trades
 - BTCUSDT long -0.34 $ (rebalance)
