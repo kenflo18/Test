@@ -1,14 +1,14 @@
 # Trading-Bot Zwischenstand – Trendfolge (4h)
 
-Stand: 2026-10-26 16:54 UTC
+Stand: 2026-10-26 17:09 UTC
 Laeuft bis: 2026-10-27 20:31 UTC
 
-- Kapital: **499.85 $** (Start 500 $, -0.03 %)
-- Realisiert: 499.91 $ | offen: -0.06 $
+- Kapital: **498.22 $** (Start 500 $, -0.36 %)
+- Realisiert: 499.91 $ | offen: -1.69 $
 - Trades: 0 | Gewinner: 0 (0 %)
 - Status: aktiv
 
 ## Offene Positionen
-- DOTUSDT SHORT @ 1.0097, Stop 1.09229, jetzt 1.01
+- DOTUSDT SHORT @ 1.0097, Stop 1.09229, jetzt 1.019
 
 ## Letzte Trades
