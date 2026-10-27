@@ -1,6 +1,6 @@
 {
  "balance": 500.3953705384386,
- "peak": 510.5354219632989,
+ "peak": 511.51524550638703,
  "pos": {
   "BNBUSDT": {
    "dir": 1,
@@ -122,18 +122,18 @@
   }
  ],
  "last_px": {
-  "BTCUSDT": 80290.01,
-  "ETHUSDT": 2330.01,
-  "BNBUSDT": 745.27,
-  "LTCUSDT": 56.73,
-  "ADAUSDT": 0.2064,
-  "XRPUSDT": 1.309,
-  "TRXUSDT": 0.3295,
-  "LINKUSDT": 11.38,
-  "DOGEUSDT": 0.07794,
-  "SOLUSDT": 100.91,
-  "DOTUSDT": 1.007,
-  "AVAXUSDT": 8.941
+  "BTCUSDT": 80049.53,
+  "ETHUSDT": 2320.57,
+  "BNBUSDT": 743.58,
+  "LTCUSDT": 56.56,
+  "ADAUSDT": 0.2055,
+  "XRPUSDT": 1.3054,
+  "TRXUSDT": 0.3299,
+  "LINKUSDT": 11.338,
+  "DOGEUSDT": 0.07775,
+  "SOLUSDT": 100.55,
+  "DOTUSDT": 1.001,
+  "AVAXUSDT": 8.894
  },
  "start_ms": 1792874461030,
  "end_ms": 1793133119363,
