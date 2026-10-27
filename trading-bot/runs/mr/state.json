@@ -7,12 +7,12 @@
  "killed": false,
  "trades": [],
  "last_px": {
-  "BTCUSDT": 80281.6,
-  "ETHUSDT": 2330.29,
-  "SOLUSDT": 100.55,
-  "BNBUSDT": 743.83,
-  "XRPUSDT": 1.3175,
-  "DOGEUSDT": 0.07796
+  "BTCUSDT": 80364.2,
+  "ETHUSDT": 2335.46,
+  "SOLUSDT": 100.7,
+  "BNBUSDT": 744.66,
+  "XRPUSDT": 1.3174,
+  "DOGEUSDT": 0.07794
  },
  "start_ms": 1792873919290,
  "end_ms": 1793133119290,
