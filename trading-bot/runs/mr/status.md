@@ -1,6 +1,6 @@
 # Trading-Bot Zwischenstand – Mean Reversion (1h)
 
-Stand: 2026-10-27 13:42 UTC
+Stand: 2026-10-27 13:57 UTC
 Laeuft bis: 2026-10-27 20:31 UTC
 
 - Kapital: **500.00 $** (Start 500 $, +0.00 %)
