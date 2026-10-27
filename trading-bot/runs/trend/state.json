@@ -1,6 +1,6 @@
 {
  "balance": 499.24695086038594,
- "peak": 504.30217443843077,
+ "peak": 505.06868614697544,
  "pos": {
   "DOTUSDT": {
    "dir": -1,
@@ -18,7 +18,7 @@
    "qty": 4032.6434851811105,
    "entry": 0.32800157,
    "stop": 0.33121639243478196,
-   "best": 0.3275,
+   "best": 0.3274,
    "atr": 0.0010716074782606412,
    "t": 1793088030981,
    "bars": 0,
@@ -30,18 +30,18 @@
  "killed": false,
  "trades": [],
  "last_px": {
-  "BTCUSDT": 79795.18,
-  "ETHUSDT": 2313.3,
-  "SOLUSDT": 99.92,
-  "BNBUSDT": 737.35,
-  "XRPUSDT": 1.301,
-  "DOGEUSDT": 0.07717,
-  "ADAUSDT": 0.2039,
-  "AVAXUSDT": 8.789,
-  "LINKUSDT": 11.344,
-  "LTCUSDT": 56.34,
+  "BTCUSDT": 79724.01,
+  "ETHUSDT": 2311.68,
+  "SOLUSDT": 99.8,
+  "BNBUSDT": 736.58,
+  "XRPUSDT": 1.2996,
+  "DOGEUSDT": 0.07712,
+  "ADAUSDT": 0.2033,
+  "AVAXUSDT": 8.773,
+  "LINKUSDT": 11.324,
+  "LTCUSDT": 56.28,
   "TRXUSDT": 0.3275,
-  "DOTUSDT": 0.993
+  "DOTUSDT": 0.99
  },
  "start_ms": 1792874461029,
  "end_ms": 1793133119362,
